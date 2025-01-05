@@ -1,35 +1,76 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import {useState} from "react";
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+    const [games, setGames] = useState(() => {
+        const storedGames = localStorage.getItem("obc-game-lib");
+        if (!storedGames) return [];
+        return JSON.parse(storedGames);
+    });
+    const [title, setTitle] = useState("");
+    const [cover, setCover] = useState("");
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    const addGame = ({title, cover}) => {
+        const id = Math.floor(Math.random() * 1000000);
+        const game = {id, title, cover};
+        setGames(state => {
+            const newState = [...state, game];
+            localStorage.setItem("obc-game-lib", JSON.stringify(newState))
+            return newState;
+        });
+    }
+
+    const removeGame = (id) => {
+        setGames(state => {
+            const newState = state.filter(game => game.id !== id)
+            localStorage.setItem("obc-game-lib", JSON.stringify(newState))
+            return newState;
+        });
+    }
+
+    function handleFormSubmit(event) {
+        event.preventDefault();
+        addGame({title, games});
+        setTitle("");
+        setCover("");
+    }
+
+    return (
+        <div id="app">
+            <h1>Biblioteca de Jogos</h1>
+            <form onSubmit={handleFormSubmit}>
+                <div>
+                    <label htmlFor="title">Título:</label>
+                    <input
+                        type="text"
+                        name="title"
+                        id="title"
+                        value={title}
+                        onChange={(event) => setTitle(event.target.value)}
+                    />
+                </div>
+                <div>
+                    <label htmlFor="cover">Capa:</label>
+                    <input
+                        type="text"
+                        name="cover"
+                        id="cover"
+                        value={cover}
+                        onChange={(event) => setCover(event.target.value)}
+                    />
+                </div>
+                <button type="submit">Adicionar à biblioteca</button>
+            </form>
+            <div className="games">
+                {games.map((game) => (
+                    <div key={game.id}>
+                        <img src={game.cover} alt={game.title} />
+                        <div>
+                            <h2>{game.title}</h2>
+                            <button onClick={()=> removeGame(game.id)}>Remover</button>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
 }
-
-export default App
