@@ -1,31 +1,10 @@
-import {useState} from "react";
 import Games from "./components/Games.jsx";
 import NewGameForm from "./components/NewGameForm.jsx";
+import useGameCollections from "./hooks/useGameCollections.js";
 
 export default function App() {
-    const [games, setGames] = useState(() => {
-        const storedGames = localStorage.getItem("obc-game-lib");
-        if (!storedGames) return [];
-        return JSON.parse(storedGames);
-    });
 
-    const addGame = ({title, cover}) => {
-        const id = Math.floor(Math.random() * 1000000);
-        const game = {id, title, cover};
-        setGames(state => {
-            const newState = [...state, game];
-            localStorage.setItem("obc-game-lib", JSON.stringify(newState))
-            return newState;
-        });
-    }
-
-    const removeGame = (id) => {
-        setGames(state => {
-            const newState = state.filter(game => game.id !== id)
-            localStorage.setItem("obc-game-lib", JSON.stringify(newState))
-            return newState;
-        });
-    }
+    const { games, addGame, removeGame } = useGameCollections();
 
     return (
         <div id="app">
@@ -34,14 +13,14 @@ export default function App() {
             <NewGameForm addGame={addGame} />
 
             <div className="games">
-                {games.map((game) => (
+                {games.length > 0 ? games.map((game) => (
                     <Games
                         key={game.id}
                         title={game.title}
                         cover={game.cover}
                         onRemove={() => removeGame(game.id)}
                     />
-                ))}
+                )) : <h2>Nenhum jogo cadastrado, por favor cadastre seus jogos!</h2>}
             </div>
         </div>
     );
