@@ -1,5 +1,6 @@
 import {useState} from "react";
 import PropTypes from "prop-types";
+import TextInput from "./TextInput.jsx";
 
 NewGameForm.prototype = {
     addGame: PropTypes.func,
@@ -19,26 +20,8 @@ export default function NewGameForm({addGame}) {
 
     return (
         <form onSubmit={handleFormSubmit}>
-            <div>
-                <label htmlFor="title">Título:</label>
-                <input
-                    type="text"
-                    name="title"
-                    id="title"
-                    value={title}
-                    onChange={(event) => setTitle(event.target.value)}
-                />
-            </div>
-            <div>
-                <label htmlFor="cover">Capa:</label>
-                <input
-                    type="text"
-                    name="cover"
-                    id="cover"
-                    value={cover}
-                    onChange={(event) => setCover(event.target.value)}
-                />
-            </div>
+            <TextInput value={title} setValue={setTitle} label="Título:"/>
+            <TextInput value={cover} setValue={setCover} label="Capa:"/>
             <button type="submit">Adicionar à biblioteca</button>
         </form>
     )
